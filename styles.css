@@ -1,0 +1,45 @@
+.player {
+    margin-top: 50px;
+    display: grid;
+    grid-template-columns: repeat(4, 100px);
+    grid-template-rows: 100px auto auto;
+    justify-content: center;
+}
+
+.dealer {
+    margin-top: 100px;
+    display: grid;
+    grid-template-columns: 100px;
+    grid-template-rows: 100px auto 40px auto;
+    justify-content: center;
+}
+
+.cards {
+    display: grid;
+    grid-template-columns: repeat(2, 30px);
+    grid-template-rows: repeat(4, 25px);
+    justify-content: center;
+}
+
+.user-options {
+    margin-top: 25px;
+    display: grid;
+    grid-template-columns: 50px 50px;
+    justify-content: center;
+}
+
+.text {
+    text-align: center;
+}
+
+.disabled {
+    cursor: not-allowed;
+}
+
+.red-card {
+    color: red;
+}
+
+.black-card {
+    color: black;
+}
