@@ -1,2 +1,2 @@
 # BlackJack
-BlackJack Web App with card counting tool
+Simple BlackJack Simulator with card counting feature
