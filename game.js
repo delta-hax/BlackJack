@@ -1,25 +1,24 @@
 import Deck from "./deck.js"
 
 const CARD_VALUE_MAP = {"2": 2, "3": 3, "4": 4, "5": 5, "6": 6, "7": 7, "8": 8, "9": 9, "10": 10, J: 10, Q: 10, K: 10, A: 11}
-const shoeCount = document.querySelector(".shoe-count");
-const cardCount = document.querySelector(".card-count");
-const dealerElement = document.querySelector(".dealer");
-const userHand = document.querySelector(".user-hand");
-const userResult = document.querySelector(".user-result");
-const dealerHand = document.querySelector(".dealer-hand");
-const dealerResult = document.querySelector(".dealer-result");
-const playerOneHand = document.querySelector(".player-one-hand");
-const playerOneResult = document.querySelector(".player-one-result");
-const playerTwoHand = document.querySelector(".player-two-hand");
-const playerTwoResult = document.querySelector(".player-two-result");
-const playerThreeHand = document.querySelector(".player-three-hand");
-const playerThreeResult = document.querySelector(".player-three-result");
-const hitButton = document.querySelector(".hit");
-const stayButton = document.querySelector(".stay");
+const SHOE_COUNT = document.querySelector(".shoe-count");
+const CARD_COUNT = document.querySelector(".card-count");
+const DEALER = document.querySelector(".dealer");
+const USER_HAND_HTML = document.querySelector(".user-hand");
+const USER_RESULT_HTML = document.querySelector(".user-result");
+const DEALER_HAND_HTML = document.querySelector(".dealer-hand");
+const DEALER_RESULT_HTML = document.querySelector(".dealer-result");
+const P1_HAND_HTML = document.querySelector(".player-one-hand");
+const P1_RESULT_HTML = document.querySelector(".player-one-result");
+const P2_HAND_HTML = document.querySelector(".player-two-hand");
+const P2_RESULT_HTML = document.querySelector(".player-two-result");
+const P3_HAND_HTML = document.querySelector(".player-three-hand");
+const P3_RESULT_HTML = document.querySelector(".player-three-result");
+const HIT_BTN = document.querySelector(".hit");
+const STAY_BTN = document.querySelector(".stay");
 
 let deck, userCards, p1Cards, p2Cards, p3Cards, dealerCards;
 
-startGame()
 async function startGame() {
     if (!deck || deck.numberOfCards <= 78) {
         deck = new Deck();
@@ -27,43 +26,28 @@ async function startGame() {
     }
     cleanBeforeRound();
     await dealCards();
-    cpuMove(p1Cards, playerOneHand, playerOneResult);
+    cpuMove(p1Cards, P1_HAND_HTML, P1_RESULT_HTML);
     await new Promise(resolve => setTimeout(resolve, 1000));
-    cpuMove(p2Cards, playerTwoHand, playerTwoResult);
+    cpuMove(p2Cards, P2_HAND_HTML, P2_RESULT_HTML);
     await new Promise(resolve => setTimeout(resolve, 1000));
-    cpuMove(p3Cards, playerThreeHand, playerThreeResult);
+    cpuMove(p3Cards, P3_HAND_HTML, P3_RESULT_HTML);
     await new Promise(resolve => setTimeout(resolve, 1000));
     userMove();
 }
 
-function cleanBeforeRound() {
-    p1Cards = [];
-    p2Cards = [];
-    p3Cards = [];
-    userCards = [];
-    dealerCards = [];
-    playerOneHand.innerHTML = "";
-    playerTwoHand.innerHTML = "";
-    playerThreeHand.innerHTML = "";
-    userHand.innerHTML = "";
-    dealerHand.innerHTML = "";
-    playerOneResult.innerHTML = "";
-    playerTwoResult.innerHTML = "";
-    playerThreeResult.innerHTML = "";
-    userResult.innerHTML = "";
-    dealerResult.innerHTML = "";
-    updateShoeCount();
-    updateCardCount();
-}
+startGame()
+
+
+// game logic
 
 async function dealCards() {
     let playerHands = [p1Cards, p2Cards, p3Cards, userCards, dealerCards];
-    let playerHandsHtml = [playerOneHand, playerTwoHand, playerThreeHand, userHand, dealerHand];
+    let playerHandsHtml = [P1_HAND_HTML, P2_HAND_HTML, P3_HAND_HTML, USER_HAND_HTML, DEALER_HAND_HTML];
     for (let i = 0; i < 2; ++i) {
         for (let j = 0; j < playerHands.length; ++j) {
             let card = deck.pop();
             playerHands[j].push(card);
-            let dealersHiddenCard = playerHandsHtml[j] == dealerHand && i == 1;
+            let dealersHiddenCard = playerHandsHtml[j] == DEALER_HAND_HTML && i == 1;
             if (!dealersHiddenCard) {
                 playerHandsHtml[j].appendChild(card.html);
                 updateShoeCount();
@@ -94,32 +78,32 @@ function cpuMove(playerHand, playerHandHtml, playerResult) {
 }
 
 function userMove() {
-    hitButton.classList.remove('disabled');
-    stayButton.classList.remove('disabled');
+    HIT_BTN.classList.remove('disabled');
+    STAY_BTN.classList.remove('disabled');
     if (naturalHand(userCards)) {
-        userResult.innerHTML = "natural";
+        USER_RESULT_HTML.innerHTML = "natural";
         dealerMove()
         return;
     }
-    hitButton.addEventListener('click', userHits);
-    stayButton.addEventListener('click', userStays);
+    HIT_BTN.addEventListener('click', userHits);
+    STAY_BTN.addEventListener('click', userStays);
 }
 
 function dealerMove() {
     cleanUpAfterUserMove();
-    dealerHand.appendChild(dealerCards[1].html);
+    DEALER_HAND_HTML.appendChild(dealerCards[1].html);
     if (naturalHand(dealerCards)) {
-        dealerResult.innerHTML = "natural";
+        DEALER_RESULT_HTML.innerHTML = "natural";
         declareWinners();
         return;
     }
     while (getPlayerHandSum(dealerCards) <= 16) {
-        hit(dealerCards, dealerHand);
+        hit(dealerCards, DEALER_HAND_HTML);
     }
     if (getPlayerHandSum(dealerCards) > 21) {
-        dealerResult.innerHTML = "bust";
+        DEALER_RESULT_HTML.innerHTML = "bust";
     } else {
-        dealerResult.innerHTML = "stay";
+        DEALER_RESULT_HTML.innerHTML = "stay";
     }
     declareWinners();
 }
@@ -128,32 +112,98 @@ function nextRound() {
     let nextButton = document.createElement("button")
     nextButton.innerText = 'next round';
     nextButton.classList.add('next-round');
-    dealerElement.appendChild(nextButton);
+    DEALER.appendChild(nextButton);
     document.querySelector(".next-round").addEventListener('click', () => { 
-        dealerElement.removeChild(dealerElement.lastChild);
+        DEALER.removeChild(DEALER.lastChild);
         startGame(); 
     });
 }
 
+function declareWinners() {
+    let dealerSum = getPlayerHandSum(dealerCards);
+    let playerResults = [P1_RESULT_HTML, P2_RESULT_HTML, P3_RESULT_HTML, USER_RESULT_HTML]
+    let playerSums = [getPlayerHandSum(p1Cards), getPlayerHandSum(p2Cards), getPlayerHandSum(p3Cards), getPlayerHandSum(userCards)]
+    for (let i = 0; i < playerResults.length; ++i) {
+        if (playerSums[i] <= 21 && dealerSum > 21) {
+            playerResults[i].innerHTML = "WIN";
+        } else if (dealerSum > 21) {
+            continue;
+        } else if (playerSums[i] <= 21 && playerSums[i] > dealerSum) {
+            playerResults[i].innerHTML = "WIN";
+        } else if (playerSums[i] == dealerSum) {
+            playerResults[i].innerHTML = "TIE";
+        } else if (playerSums[i] < dealerSum) {
+            playerResults[i].innerHTML = "LOSE";
+        }
+    }
+    nextRound();
+}
+
+
+// clean up functions
+
+function cleanBeforeRound() {
+    p1Cards = [];
+    p2Cards = [];
+    p3Cards = [];
+    userCards = [];
+    dealerCards = [];
+    P1_HAND_HTML.innerHTML = "";
+    P2_HAND_HTML.innerHTML = "";
+    P3_HAND_HTML.innerHTML = "";
+    USER_HAND_HTML.innerHTML = "";
+    DEALER_HAND_HTML.innerHTML = "";
+    P1_RESULT_HTML.innerHTML = "";
+    P2_RESULT_HTML.innerHTML = "";
+    P3_RESULT_HTML.innerHTML = "";
+    USER_RESULT_HTML.innerHTML = "";
+    DEALER_RESULT_HTML.innerHTML = "";
+    updateShoeCount();
+    updateCardCount();
+}
+
 function cleanUpAfterUserMove() {
-    hitButton.classList.add('disabled');
-    stayButton.classList.add('disabled');
-    hitButton.removeEventListener('click', userHits);
-    stayButton.removeEventListener('click', userStays);
+    HIT_BTN.classList.add('disabled');
+    STAY_BTN.classList.add('disabled');
+    HIT_BTN.removeEventListener('click', userHits);
+    STAY_BTN.removeEventListener('click', userStays);
+}
+
+
+// helpers
+
+function naturalHand(playerHand) {
+    return getPlayerHandSum(playerHand) == 21 && playerHand.length == 2;
+}
+
+function updateShoeCount() {
+    SHOE_COUNT.innerHTML = `Cards In Shoe: ${deck.numberOfCards}`
+}
+
+function updateCardCount() {
+    CARD_COUNT.innerHTML = `Running Count: ${deck.runningCount}`
 }
 
 function userStays(event) {
-    userResult.innerHTML = "stay";
+    USER_RESULT_HTML.innerHTML = "stay";
     dealerMove();
     return;
 }
 
 function userHits(event) {
-    hit(userCards, userHand);
+    hit(userCards, USER_HAND_HTML);
     if (getPlayerHandSum(userCards) > 21) {
-        userResult.innerHTML = "bust";
+        USER_RESULT_HTML.innerHTML = "bust";
         dealerMove();
     }
+}
+
+function hit(playerHand, playerHandHtml) {
+    let card = deck.pop();
+    playerHand.push(card);
+    playerHandHtml.appendChild(card.html);
+    updateShoeCount();
+    updateCardCount();
 }
 
 function getPlayerHandSum(playerHand) {
@@ -167,77 +217,4 @@ function getPlayerHandSum(playerHand) {
         sum -= 10;
     }
     return sum;
-}
-
-function naturalHand(playerHand) {
-    return getPlayerHandSum(playerHand) == 21 && playerHand.length == 2;
-}
-
-function hit(playerHand, playerHandHtml) {
-    let card = deck.pop();
-    playerHand.push(card);
-    playerHandHtml.appendChild(card.html);
-    updateShoeCount();
-    updateCardCount();
-}
-
-function updateShoeCount() {
-    shoeCount.innerHTML = `Cards In Shoe: ${deck.numberOfCards}`
-}
-
-function updateCardCount() {
-    cardCount.innerHTML = `Running Count: ${deck.runningCount}`
-}
-
-function declareWinners() {
-    let dealerSum = getPlayerHandSum(dealerCards);
-    let p1Sum = getPlayerHandSum(p1Cards);
-    let p2Sum = getPlayerHandSum(p2Cards);
-    let p3Sum = getPlayerHandSum(p3Cards);
-    let userSum = getPlayerHandSum(userCards);
-    if (dealerSum > 21) {
-        if (p1Sum <= 21) {
-            playerOneResult.innerHTML = "WIN";
-        }
-        if (p2Sum <= 21) {
-            playerTwoResult.innerHTML = "WIN";
-        }
-        if (p3Sum <= 21) {
-            playerThreeResult.innerHTML = "WIN";
-        }
-        if (userSum <= 21) {
-            userResult.innerHTML = "WIN";
-        }
-        nextRound();
-        return;
-    }
-    if (p1Sum <= 21 && p1Sum > dealerSum) {
-        playerOneResult.innerHTML = "WIN";
-    } else if (p1Sum == dealerSum) {
-        playerOneResult.innerHTML = "TIE";
-    } else if (p1Sum < dealerSum) {
-        playerOneResult.innerHTML = "LOSE";
-    }
-    if (p2Sum <= 21 && p2Sum > dealerSum) {
-        playerTwoResult.innerHTML = "WIN";
-    } else if (p2Sum == dealerSum) {
-        playerTwoResult.innerHTML = "TIE";
-    } else if (p2Sum < dealerSum) {
-        playerTwoResult.innerHTML = "LOSE";
-    }
-    if (p3Sum <= 21 && p3Sum > dealerSum) {
-        playerThreeResult.innerHTML = "WIN";
-    } else if (p3Sum == dealerSum) {
-        playerThreeResult.innerHTML = "TIE";
-    } else if (p3Sum < dealerSum) {
-        playerThreeResult.innerHTML = "LOSE";
-    }
-    if (userSum <= 21 && userSum > dealerSum) {
-        userResult.innerHTML = "WIN";
-    } else if (userSum == dealerSum) {
-        userResult.innerHTML = "TIE";
-    } else if (userSum < dealerSum) {
-        userResult.innerHTML = "LOSE";
-    }
-    nextRound();
 }
